@@ -30,14 +30,11 @@ function readLine() {
  */
 
 function checkValidity(currLoc, plusLoc) {
-    console.log(currLoc, plusLoc);
     for (let i = 0; i < currLoc.length; i++) {
         if (plusLoc.includes(currLoc[i])) {
-            console.log(false)
             return false;
         }
     }
-    console.log(true)
     return true;
 }
 
@@ -58,7 +55,6 @@ function twoPluses(grid, n, m) {
     // if there are always two good pluses, we can ignore the edges
     for (let i = 1; i < n-1; i++) {  // vertical
         for (let j = 1; j < m-1; j++) {  // horizontal
-            console.log(i,j)
             if (grid[i][j] == 'B') {
                 continue;
             }
@@ -75,6 +71,9 @@ function twoPluses(grid, n, m) {
                         currLoc.push(String(i)+","+String(j+currPlus));
                         
                         currPlus++;
+
+                        // validity checker: checks if making the plus bigger would allow it to be compatible with one of the
+                        // two pluses; if not, it breaks out, returning the last iteration of the plus to be checked
                         if (currPlus > Math.min(plus_0, plus_1) && currPlus > 1 && plus_0_loc.length != 0) {
                             if (((plus_0 >= plus_1) && (checkValidity(currLoc, plus_0_loc) == false)) || ((plus_1 >= plus_0) && (checkValidity(currLoc, plus_1_loc) == false))) {
                                 if ((plus_1 == plus_0) && ((checkValidity(currLoc, plus_1_loc) == true) || (checkValidity(currLoc, plus_0_loc) == true))) {
@@ -85,7 +84,6 @@ function twoPluses(grid, n, m) {
                                     plus_1_loc = plus_2_loc;
                                     continue;
                                 }
-                                console.log("splicing lol");
                                 currLoc.splice(currLoc.length-4, 4);
                                 currPlus--;
                                 break;  // leave if it would not be able to go anywhere
@@ -99,35 +97,27 @@ function twoPluses(grid, n, m) {
                 
                 if (currPlus > Math.min(plus_0, plus_1) && currPlus > 1) {
                     if (plus_0 >= plus_1) { // replace plus_1, check validity of plus_0
-                        console.log("checking to replace plus 1")
                         if (checkValidity(currLoc, plus_0_loc)) {
                             plus_2 = plus_1;
                             plus_2_loc = plus_1_loc;
                             plus_1 = currPlus;   
                             plus_1_loc = currLoc;
-                            console.log("replacing plus_1_loc");
-                            console.log("Still", plus_0_loc, plus_1_loc);
                             break;
                         }
                     }
-                    if (plus_0 <= plus_1) {
-                        console.log("checking to replace plus 0")
+                    if (plus_0 <= plus_1) {  // replace plus_0, check validity of plus_1; allows for scenario where plus_0 = plus_1
                         if (checkValidity(currLoc, plus_1_loc)) {
                             plus_2 = plus_0;
                             plus_2_loc = plus_0_loc;
                             plus_0 = currPlus;
                             plus_0_loc = currLoc;
-                            console.log("replacing plus_0_loc bottom")
                         }
                     }
-                    
-                    console.log("Still", plus_0_loc, plus_1_loc);
                 }
             }
         }
     }
-    
-    console.log(plus_0, plus_1);
+
     return getProduct(plus_0, plus_1);
 }
 
